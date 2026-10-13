@@ -4,8 +4,9 @@ import sqlite3
 
 class SQLiteDB:
     def __init__(self, database_url: str):
-        self.conn = sqlite3.connect(database_url)
+        self.conn = sqlite3.connect(database_url, check_same_thread=False)
         self.cursor = self.conn.cursor()
+        self._lock = threading.Lock()
 
         # Create a table for key-value pairs if it doesn't exist
         self.cursor.execute(
