@@ -1,8 +1,4 @@
-# Rollbot 🎲
-
-Welcome to **Rollbot**, your versatile tabletop dice rolling companion for Discord! Whether you're embarking on epic adventures or engaging in strategic battles, Rollbot ensures your dice rolls are seamless and fair.
-
-Deploy yourself or use the [publicly hosted version](https://discord.com/oauth2/authorize?client_id=712234733542572063&scope=bot&permissions=35840). Go to [the rollbot website](https://tmiedema.com/rollbot) for more information.
+Ayyy this is just a little project for an RPG I'm in. Feel free to use it if you're interested.
 
 ## Features ✨
 
