@@ -1,63 +1,75 @@
 from typing import Any, Literal
 
 import structlog
-from discord import Interaction
+import fluxer
 
 from . import handlers, text
-from .main import tree
+from .main import bot
 
 logger = structlog.get_logger()
 
 
-def log_action(action, context: Interaction, data: Any = ""):
+def log_action(action, context: fluxer.Message, data: Any = ""):
     logger.info(
         "Performing action",
         action=action,
-        user=context.user.name,
+        user=context.author.name,
         data=data,
     )
 
 
-@tree.command(name="help", description="Show a help message")
-async def implement_help(context: Interaction):
+@bot.command(name="help", description="Show a help message")
+async def implement_help(context: fluxer.Message):
     log_action("help", context)
-    await context.response.send_message(text.helptext)
+    await context.reply(text.helptext)
 
 
-@tree.command(name="roll", description="Roll some dice, like 'd8+3' or 'max(d20, d20) + 8'.")
-async def implement_roll(context: Interaction, roll: str):
-    await context.response.defer(thinking=True)
+@bot.command(name="roll")
+async def implement_roll(context: fluxer.Message, *, roll: str):
     log_action("roll", context, f"roll: {roll}")
-    await handlers.roll(context, roll)
+    placeholder = await context.reply("Rolling…")
+    await handlers.roll(context, placeholder, roll)
 
 
-@tree.command(name="distribution", description="Plot the distribution of a diceroll.")
-async def implement_distribution(context: Interaction, roll: str):
-    await context.response.defer(thinking=True)
+@bot.command(name="distribution")
+async def implement_distribution(context: fluxer.Message, *, roll: str):
     log_action("distribution", context, f"roll: {roll}")
-    await handlers.distribution(context, roll)
+    placeholder = await context.reply("Plotting…")
+    await handlers.distribution(context, placeholder, roll)
 
 
-@tree.command(name="list", description="List your macros.")
-async def implement_varlist(context: Interaction):
-    await context.response.defer(thinking=True)
+@bot.command(name="list")
+async def implement_varlist(context: fluxer.Message):
     log_action("list", context)
-    await handlers.varlist(context)
+    placeholder = await context.reply("Loading…")
+    await handlers.varlist(context, placeholder)
 
 
-@tree.command(name="unset", description="Unset a macros.")
-async def implement_unset(context: Interaction, macro: str):
-    await context.response.defer(thinking=True)
+@bot.command(name="unset")
+async def implement_unset(context: fluxer.Message, *, macro: str):
     log_action("unset", context)
-    await handlers.unset(context, macro)
+    placeholder = await context.reply("Unsetting…")
+    await handlers.unset(context, placeholder, macro)
 
 
 type Scope = Literal["global", "user", "guild"]
 type Timespan = Literal["day", "week", "month"]
 
 
-@tree.command(name="stats", description="Show statistics for a die.")
-async def implement_stats(context: Interaction, scope: Scope, die: int, timespan: Timespan):
-    await context.response.defer(thinking=True)
-    log_action("stats", context, {"scope": scope, "die": die, "timespan": timespan})
-    await handlers.statistics(context, scope, die, timespan)
+@bot.command(name="stats")
+async def implement_stats(context: fluxer.Message, scope: str, die: str, timespan: str):
+    if scope not in ("global", "user", "guild"):
+        await context.reply("scope must be one of: global, user, guild")
+        return
+    if timespan not in ("day", "week", "month"):
+        await context.reply("timespan must be one of: day, week, month")
+        return
+    try:
+        die_int = int(die)
+    except ValueError:
+        await context.reply("die must be an integer")
+        return
+
+    log_action("stats", context, {"scope": scope, "die": die_int, "timespan": timespan})
+    placeholder = await context.reply("Crunching numbers…")
+    await handlers.statistics(context, placeholder, scope, die_int, timespan)

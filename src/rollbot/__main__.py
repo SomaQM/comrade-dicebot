@@ -12,10 +12,10 @@ config = dotenv.dotenv_values(os.environ.get("ROLLBOT_CONFIG_FILE", "/etc/data/e
 
 setup_logging()
 
-token = config["DISCORD_TOKEN"]
+token = config["FLUXER_TOKEN"]
 db = SQLiteDB(config["SQLITE_PATH"])
 var_env_provider.set_db(db)
 stat_tracker.set_db(db)
 
-bot.run(token, log_handler=None)
+bot.run(token)
 db.close()
