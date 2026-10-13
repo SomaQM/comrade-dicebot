@@ -110,7 +110,7 @@ async def statistics(
         scope_name = context.guild.name
         stats = stat_tracker.get_guild_stats(str(context.guild.id), die, days)
     elif scope == "user":
-        scope_name = context.author.name
+        scope_name = context.author.username
         stats = stat_tracker.get_user_stats(str(context.author.id), die, days)
     else:
         await placeholder.edit(content="Invalid scope, can be global, guild or user")
