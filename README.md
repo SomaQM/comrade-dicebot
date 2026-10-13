@@ -4,16 +4,16 @@ Ayyy this is just a little project for an RPG I'm in. Feel free to use it if you
 
 - **Flexible dice rolling:** Supports standard and custom dice notations, including complex expressions like `d8+3` or `max(d20, d20) + 8`.
 - **Probability distributions:** Visualize roll distributions to understand outcome probabilities.
-- **User-friendly commands:** Intuitive slash commands for effortless interaction.
+- **User-friendly commands:** Intuitive text commands for effortless interaction.
 - **Macro management:** Create and manage roll macros for quick access to frequently used rolls.
 
 ## Usage 📖
 
-Once RollBot is running, use the following commands in your Discord server:
+Once Comrade Dicebot is running, use the following commands in your Discord server:
 
-- `/roll [expression]`: Rolls dice based on the provided expression.
-- `/distribution [expression]`: Displays the probability distribution for the given roll expression.
-- `/list`: Lists your saved roll macros.
+- `!roll [expression]`: Rolls dice based on the provided expression.
+- `!distribution [expression]`: Displays the probability distribution for the given roll expression.
+- `!list`: Lists your saved roll macros.
 
 ### Examples of Roll Expressions
 

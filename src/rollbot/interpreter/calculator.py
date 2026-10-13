@@ -12,8 +12,8 @@ import structlog
 from lark import Token, Tree
 from lark.visitors import Interpreter, Transformer
 
-from rollbot.stat_tracker import stat_tracker
-from rollbot.varenv import VarEnv
+from comrade-dicebot.stat_tracker import stat_tracker
+from comrade-dicebot.varenv import VarEnv
 
 from .functions import funcs
 from .parser import parser, reconstructor
@@ -790,4 +790,3 @@ def distribute(text: str, timeout: timedelta | None = None, env: VarEnv = None, 
         bins[min(int((v - minv) / binw), len(bins) - 1)] += 1
 
     return xbin, bins, t
-    

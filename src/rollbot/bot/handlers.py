@@ -5,10 +5,10 @@ import fluxer
 import structlog
 from lark.exceptions import UnexpectedInput
 
-from rollbot.interpreter.calculator import EvaluationError, evaluate
-from rollbot.plottenbakker.asyncing import BakingError, bake_distribution, bake_statistics
-from rollbot.stat_tracker import stat_tracker
-from rollbot.varenv import VarEnv, var_env_provider
+from comrade-dicebot.interpreter.calculator import EvaluationError, evaluate
+from comrade-dicebot.plottenbakker.asyncing import BakingError, bake_distribution, bake_statistics
+from comrade-dicebot.stat_tracker import stat_tracker
+from comrade-dicebot.varenv import VarEnv, var_env_provider
 
 logger = structlog.get_logger()
 
@@ -45,7 +45,7 @@ async def roll(context: fluxer.Message, placeholder: fluxer.Message, roll: str) 
         await placeholder.edit(content=result)
     except Exception:
         logger.exception("Error during edit", roll=roll)
-        await context.channel.send("Could not deliver result")
+        await context.channel.send("Something has gone terribly wrong, comrade.")
 
 
 async def distribution(context: fluxer.Message, placeholder: fluxer.Message, roll: str) -> None:
@@ -68,14 +68,14 @@ async def distribution(context: fluxer.Message, placeholder: fluxer.Message, rol
         await placeholder.edit(content=result)
     except Exception:
         logger.exception("Error during edit", roll=roll)
-        await context.channel.send("Could not deliver result")
+        await context.channel.send("Something has gone terribly wrong, comrade.")
 
 
 async def varlist(context: fluxer.Message, placeholder: fluxer.Message) -> None:
     env = get_var_env(context)
     items = env.items
     if not items:
-        await placeholder.edit(content="No macros defined")
+        await placeholder.edit(content="There are no macros, comrade.")
     else:
         await placeholder.edit(content="\n".join(f"{k} = {v}" for k, v in env.items.items()))
 
@@ -85,9 +85,9 @@ async def unset(context: fluxer.Message, placeholder: fluxer.Message, variable: 
     if variable in env.items:
         env.unset(variable)
         var_env_provider.update(env)
-        await placeholder.edit(content=f"Deleted {variable}")
+        await placeholder.edit(content=f"I have deleted {variable}, comrade!")
     else:
-        await placeholder.edit(content=f"No such macro {variable}")
+        await placeholder.edit(content=f"Comrade, there is no such macro {variable}!")
 
 
 async def statistics(

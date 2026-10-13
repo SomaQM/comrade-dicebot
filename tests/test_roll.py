@@ -3,7 +3,7 @@ from datetime import timedelta
 
 import pytest
 
-from rollbot.interpreter.calculator import distribute, evaluate
+from comrade-dicebot.interpreter.calculator import distribute, evaluate
 
 
 def test_evaluate_basic():

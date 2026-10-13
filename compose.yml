@@ -1,10 +1,10 @@
 services:
-  rollbot:
+  comrade-dicebot:
     build: .
     volumes:
       - ./secrets/env:/etc/data/env:ro,Z
-      - rollbot-data:/data
+      - comrade-dicebot-data:/data
     restart: unless-stopped
 
 volumes:
-  rollbot-data:
+  comrade-dicebot-data:

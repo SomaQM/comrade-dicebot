@@ -2,13 +2,13 @@ import os
 
 import dotenv
 
-from rollbot.bot import bot
-from rollbot.db import SQLiteDB
-from rollbot.logsetup import setup_logging
-from rollbot.stat_tracker import stat_tracker
-from rollbot.varenv import var_env_provider
+from comrade-dicebot.bot import bot
+from comrade-dicebot.db import SQLiteDB
+from comrade-dicebot.logsetup import setup_logging
+from comrade-dicebot.stat_tracker import stat_tracker
+from comrade-dicebot.varenv import var_env_provider
 
-config = dotenv.dotenv_values(os.environ.get("ROLLBOT_CONFIG_FILE", "/etc/data/env"))
+config = dotenv.dotenv_values(os.environ.get("COMRADE_DICEBOT_CONFIG_FILE", "/etc/data/env"))
 
 setup_logging()
 

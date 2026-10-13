@@ -1,6 +1,6 @@
 import pytest
 
-from rollbot.interpreter.calculator import minmax
+from comrade-dicebot.interpreter.calculator import minmax
 
 
 @pytest.mark.parametrize(

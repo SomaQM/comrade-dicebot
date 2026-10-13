@@ -2,7 +2,7 @@ import sqlite3
 from collections import defaultdict
 from datetime import datetime
 
-from rollbot.db import SQLiteDB
+from comrade-dicebot.db import SQLiteDB
 
 
 class StatTracker:

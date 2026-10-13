@@ -1,4 +1,4 @@
-from rollbot.db import SQLiteDB
+from comrade-dicebot.db import SQLiteDB
 
 
 class VarEnv:

@@ -25,7 +25,7 @@ async def hello_server(channel):
     try:
         await channel.send(
             embed=fluxer.Embed(
-                title="Thank you for using roll-bot!",
+                title="Workers of the world, unite! You have nothing to roll but your dice!",
                 description=text.welcome_text.strip(),
             )
         )

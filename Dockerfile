@@ -18,18 +18,18 @@ FROM python:3.14-slim as runtime
 
 ENV VIRTUAL_ENV=/app/.venv \
     PATH="/app/.venv/bin:$PATH" \
-    SQLITE_PATH=/data/rollbot.db
+    SQLITE_PATH=/data/comrade-dicebot.db
 
-RUN useradd rollbot && mkdir -p /app /data
+RUN useradd comrade-dicebot && mkdir -p /app /data
 
 COPY --from=builder ${VIRTUAL_ENV} ${VIRTUAL_ENV}
-COPY src/rollbot /app/rollbot
+COPY src/comrade-dicebot /app/comrade-dicebot
 
-RUN chown -R rollbot:rollbot /app /data
+RUN chown -R comrade-dicebot:comrade-dicebot /app /data
 
-USER rollbot
+USER comrade-dicebot
 WORKDIR /app
 
 VOLUME ["/data"]
 
-ENTRYPOINT ["python", "-m", "rollbot"]
+ENTRYPOINT ["python", "-m", "comrade-dicebot"]

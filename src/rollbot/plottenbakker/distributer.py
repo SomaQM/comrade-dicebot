@@ -5,8 +5,8 @@ from datetime import timedelta
 import structlog
 from lark.exceptions import UnexpectedInput
 
-from rollbot.interpreter.calculator import EvaluationError, distribute
-from rollbot.varenv import VarEnv
+from comrade-dicebot.interpreter.calculator import EvaluationError, distribute
+from comrade-dicebot.varenv import VarEnv
 
 if __name__ == "__main__":
     # Disable all logging in distributer process

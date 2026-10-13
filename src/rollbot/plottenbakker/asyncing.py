@@ -2,7 +2,7 @@ import asyncio
 import sys
 from io import BytesIO
 
-from rollbot.varenv import VarEnv
+from comrade-dicebot.varenv import VarEnv
 
 from . import BakingError
 from .plotter import plot_distribution, plot_statistics
@@ -12,7 +12,7 @@ async def bake_distribution(expression: str, env: VarEnv) -> BytesIO:
     bakery = await asyncio.subprocess.create_subprocess_exec(
         sys.executable,
         "-m",
-        "rollbot.plottenbakker.distributer",
+        "comrade-dicebot.plottenbakker.distributer",
         stdin=asyncio.subprocess.PIPE,
         stdout=asyncio.subprocess.PIPE,
         stderr=asyncio.subprocess.DEVNULL,

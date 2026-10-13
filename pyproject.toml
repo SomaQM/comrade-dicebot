@@ -1,11 +1,11 @@
 [tool.poetry]
-name = "rollbot"
+name = "comrade-dicebot"
 version = "2.1.3"
-description = "Rollbot is a Fluxer bot for rolling dice."
+description = "Comrade Dicebot is a Fluxer bot for rolling dice."
 authors = ["Thijs Miedema <mail@tmiedema.com>", "SomaQM"]
 license = "MIT"
 packages = [
-    {include="rollbot", from="src"}
+    {include="comrade-dicebot", from="src"}
 ]
 
 [tool.poetry.dependencies]
@@ -41,9 +41,9 @@ dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
 max-complexity = 10
 
 [tool.pytest.ini_options]
-addopts = "--cov=rollbot --cov-report xml --cov-report term-missing --cov-fail-under=75 --cov-branch"
+addopts = "--cov=comrade-dicebot --cov-report xml --cov-report term-missing --cov-fail-under=75 --cov-branch"
 
 [tool.coverage.run]
 omit = [
-    "src/rollbot/bot/*",
+    "src/comrade-dicebot/bot/*",
 ]
