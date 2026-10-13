@@ -1,10 +1,10 @@
 services:
-  comrade-dicebot:
+  dicebot:
     build: .
     volumes:
       - ./secrets/env:/etc/data/env:ro,Z
-      - comrade-dicebot-data:/data
+      - dicebot-data:/data
     restart: unless-stopped
 
 volumes:
-  comrade-dicebot-data:
+  dicebot-data:

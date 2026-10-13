@@ -41,7 +41,7 @@ dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
 max-complexity = 10
 
 [tool.pytest.ini_options]
-addopts = "--cov=comrade-dicebot --cov-report xml --cov-report term-missing --cov-fail-under=75 --cov-branch"
+addopts = "--cov=dicebot --cov-report xml --cov-report term-missing --cov-fail-under=75 --cov-branch"
 
 [tool.coverage.run]
 omit = [

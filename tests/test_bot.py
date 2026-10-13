@@ -20,7 +20,7 @@ def _make_context():
 def test_roll_timeout():
     context = _make_context()
 
-    with patch("comrade-dicebot.bot.handlers.asyncio.wait_for", side_effect=asyncio.TimeoutError):
+    with patch("dicebot.bot.handlers.asyncio.wait_for", side_effect=asyncio.TimeoutError):
         asyncio.run(roll_handler(context, "1000000d1"))
 
     context.followup.send.assert_awaited_once()

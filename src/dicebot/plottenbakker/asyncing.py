@@ -12,7 +12,7 @@ async def bake_distribution(expression: str, env: VarEnv) -> BytesIO:
     bakery = await asyncio.subprocess.create_subprocess_exec(
         sys.executable,
         "-m",
-        "comrade-dicebot.plottenbakker.distributer",
+        "dicebot.plottenbakker.distributer",
         stdin=asyncio.subprocess.PIPE,
         stdout=asyncio.subprocess.PIPE,
         stderr=asyncio.subprocess.DEVNULL,
