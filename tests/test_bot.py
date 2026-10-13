@@ -19,10 +19,11 @@ def _make_context():
 
 def test_roll_timeout():
     context = _make_context()
+    placeholder = AsyncMock()
 
     with patch("dicebot.bot.handlers.asyncio.wait_for", side_effect=asyncio.TimeoutError):
-        asyncio.run(roll_handler(context, "1000000d1"))
+        asyncio.run(roll_handler(context, placeholder, "1000000d1"))
 
-    context.followup.send.assert_awaited_once()
-    sent = context.followup.send.call_args[0][0]
+    placeholder.edit.assert_awaited_once()
+    sent = placeholder.edit.call_args.kwargs["content"]
     assert "timed out" in sent.lower()

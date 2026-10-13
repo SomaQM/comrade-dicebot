@@ -54,9 +54,7 @@ async def distribution(context: fluxer.Message, placeholder: fluxer.Message, rol
     try:
         png = await bake_distribution(roll, env)
         await placeholder.delete()
-        await context.channel.send(
-            file=fluxer.File(png, filename=f"{secrets.token_urlsafe(8)}.png")
-        )
+        await context.channel.send(file=fluxer.File(png, filename=f"{secrets.token_urlsafe(8)}.png"))
         return
     except BakingError as e:
         result = e.args[0]
@@ -90,9 +88,7 @@ async def unset(context: fluxer.Message, placeholder: fluxer.Message, variable: 
         await placeholder.edit(content=f"Comrade, there is no such macro {variable}!")
 
 
-async def statistics(
-    context: fluxer.Message, placeholder: fluxer.Message, scope: str, die: int, timespan: str
-) -> None:
+async def statistics(context: fluxer.Message, placeholder: fluxer.Message, scope: str, die: int, timespan: str) -> None:
     if timespan == "day":
         days = 1
     elif timespan == "week":
@@ -126,6 +122,4 @@ async def statistics(
         f"{scope_name} statistics of a d{die} this {timespan}, rolled {rolls} times.", stats, die
     )
     await placeholder.delete()
-    await context.channel.send(
-        file=fluxer.File(png, filename=f"{secrets.token_urlsafe(8)}.png")
-    )
+    await context.channel.send(file=fluxer.File(png, filename=f"{secrets.token_urlsafe(8)}.png"))

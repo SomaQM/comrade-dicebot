@@ -1,7 +1,7 @@
 from typing import Any, Literal
 
-import structlog
 import fluxer
+import structlog
 
 from . import handlers, text
 from .main import bot

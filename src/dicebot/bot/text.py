@@ -29,4 +29,7 @@ helptext = """
 • `"This is a roll:" d20; "And another one" d100+20`
 """
 
-welcome_text = "Comrade Dicebot answers to text commands. Deploy !roll and !distribution to roll dice. The dice belong to the people. For assistance, consult SomaQM."
+welcome_text = """
+Comrade Dicebot answers to text commands. Deploy !roll and !distribution to roll dice.
+The dice belong to the people. For assistance, consult SomaQM.
+"""

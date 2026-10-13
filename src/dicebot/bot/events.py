@@ -12,8 +12,8 @@ known_guilds: set[int] = set()
 
 @bot.event
 async def on_ready():
-    global known_guilds
-    known_guilds = {g.id for g in bot.guilds}
+    known_guilds.clear()
+    known_guilds.update(g.id for g in bot.guilds)
     logger.info("Logged in", bot_name=bot.user.username, bot_id=bot.user.id)
     for batch in itertools.batched(bot.guilds, 50):
         logger.info("Connected to guilds", guilds=[g.name for g in batch])
