@@ -13,7 +13,7 @@ def log_action(action, ctx: fluxer.Message, data: Any = ""):
     logger.info(
         "Performing action",
         action=action,
-        user=ctx.author.name,
+        user=ctx.author.username,
         data=data,
     )
 
