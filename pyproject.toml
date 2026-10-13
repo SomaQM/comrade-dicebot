@@ -1,11 +1,11 @@
 [tool.poetry]
-name = "comrade-dicebot"
+name = "dicebot"
 version = "2.1.3"
 description = "Comrade Dicebot is a Fluxer bot for rolling dice."
 authors = ["Thijs Miedema <mail@tmiedema.com>", "SomaQM"]
 license = "MIT"
 packages = [
-    {include="comrade-dicebot", from="src"}
+    {include="dicebot", from="src"}
 ]
 
 [tool.poetry.dependencies]
