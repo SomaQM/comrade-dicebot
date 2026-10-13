@@ -18,7 +18,7 @@ def log_action(action, context: fluxer.Message, data: Any = ""):
     )
 
 
-@bot.command(name="help", description="Show a help message")
+@bot.command(name="help")
 async def implement_help(context: fluxer.Message):
     log_action("help", context)
     await context.reply(text.helptext)

@@ -1,0 +1,10 @@
+services:
+  rollbot:
+    build: .
+    volumes:
+      - ./secrets/env:/etc/data/env:ro,Z
+      - rollbot-data:/data
+    restart: unless-stopped
+
+volumes:
+  rollbot-data:
