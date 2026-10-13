@@ -17,7 +17,7 @@ def get_var_env(context: fluxer.Message) -> VarEnv:
     return var_env_provider.get(
         str(context.author.id),
         str(context.author.id),
-        str(context.guild.id),
+        str(context.guild_id),
     )
 
 
