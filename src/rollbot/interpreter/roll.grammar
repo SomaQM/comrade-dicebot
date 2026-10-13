@@ -15,6 +15,8 @@ kroll.3: /[0-9]+d[0-9]+k[0-9]+/
 klroll.4: /[0-9]+d[0-9]+kl[0-9]+/
 rroll.5: /[0-9]+d[0-9]+rr[0-9]+/
 exroll.6: /[0-9]+d[0-9]+!/
+iroll.7: /[0-9]+d[0-9]+i/
+siroll.7: /d[0-9]+i/
 
 ?expression: sum
           | expression ">" sum       -> gt
@@ -37,6 +39,8 @@ exroll.6: /[0-9]+d[0-9]+!/
     | "(" expression ")"    -> brace
     | kroll
     | klroll
+    | iroll
+    | siroll
     | roll
     | sroll
     | rroll

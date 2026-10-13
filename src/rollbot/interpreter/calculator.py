@@ -49,6 +49,27 @@ def visit_children_decor(func: _InterMethod) -> _InterMethod:
     return inner
 
 
+Numeric = int | list[int]
+Value = tuple[Numeric, str]
+
+
+def _render_list(vals: list[int]) -> str:
+    return "[" + ", ".join(str(v) for v in vals) + "]"
+
+
+def _broadcast(a: Numeric, b: Numeric, op):
+    """Apply `op` element-wise if either operand is a list."""
+    if isinstance(a, list) and isinstance(b, list):
+        if len(a) != len(b):
+            raise EvaluationError("Cannot combine vectors of different lengths")
+        return [op(x, y) for x, y in zip(a, b)]
+    if isinstance(a, list):
+        return [op(x, b) for x in a]
+    if isinstance(b, list):
+        return [op(a, y) for y in b]
+    return op(a, b)
+
+
 class AnnotatedCalculateTree(Interpreter):
     roll_complexity_limit = 100_000_000
     single_roll_complexity = 10
@@ -98,6 +119,37 @@ class AnnotatedCalculateTree(Interpreter):
         stat_tracker.increment_stat(self._env.guild, self._env.user, b, res)
 
         return res, desc
+
+    @visit_children_decor
+    def iroll(self, one: str) -> Value:
+        a, b = map(int, one[:-1].split("d"))
+
+        if b == 0:
+            raise EvaluationError("Can't roll a zero-sided die.")
+
+        self.count_complexity(AnnotatedCalculateTree.single_roll_complexity * a * int(b // 20 + 1))
+        r = [random.randint(1, b) for _ in range(a)]
+        logger.info("roll", roll=one, result=r)
+
+        for v in r:
+            stat_tracker.increment_stat(self._env.guild, self._env.user, b, v)
+
+        return r, _render_list(r)
+
+    @visit_children_decor
+    def siroll(self, one: str) -> Value:
+        b = int(one[1:-1])
+
+        if b == 0:
+            raise EvaluationError("Can't roll a zero-sided die.")
+
+        self.count_complexity(AnnotatedCalculateTree.single_roll_complexity * int(b // 20 + 1))
+        res = random.randint(1, b)
+        logger.info("roll", roll=one, result=res)
+
+        stat_tracker.increment_stat(self._env.guild, self._env.user, b, res)
+
+        return [res], _render_list([res])
 
     @visit_children_decor
     def kroll(self, one: str) -> tuple[int, str]:
@@ -218,51 +270,74 @@ class AnnotatedCalculateTree(Interpreter):
         return res, desc
 
     @visit_children_decor
-    def gt(self, one: tuple[int, str], two: tuple[int, str]) -> tuple[int, str]:
+    def gt(self, one: Value, two: Value) -> Value:
         self.count_complexity(1)
-        descr = f"{one[1]} > {two[1]}"
-        return (1 if one[0] > two[0] else 0), descr
+        val = _broadcast(one[0], two[0], lambda x, y: 1 if x > y else 0)
+        if isinstance(val, list):
+            return val, _render_list(val)
+        return val, f"{one[1]} > {two[1]}"
 
     @visit_children_decor
-    def lt(self, one: tuple[int, str], two: tuple[int, str]) -> tuple[int, str]:
+    def lt(self, one: Value, two: Value) -> Value:
         self.count_complexity(1)
-        descr = f"{one[1]} < {two[1]}"
-        return (1 if one[0] < two[0] else 0), descr
+        val = _broadcast(one[0], two[0], lambda x, y: 1 if x < y else 0)
+        if isinstance(val, list):
+            return val, _render_list(val)
+        return val, f"{one[1]} < {two[1]}"
 
     @visit_children_decor
-    def eq(self, one: tuple[int, str], two: tuple[int, str]) -> tuple[int, str]:
+    def eq(self, one: Value, two: Value) -> Value:
         self.count_complexity(1)
-        descr = f"{one[1]} == {two[1]}"
-        return (1 if one[0] == two[0] else 0), descr
+        val = _broadcast(one[0], two[0], lambda x, y: 1 if x == y else 0)
+        if isinstance(val, list):
+            return val, _render_list(val)
+        return val, f"{one[1]} == {two[1]}"
 
     @visit_children_decor
-    def add(self, one: tuple[int, str], two: tuple[int, str]) -> tuple[int, str]:
+    def add(self, one: Value, two: Value) -> Value:
         self.count_complexity(1)
-        return (one[0] + two[0]), f"{one[1]} + {two[1]}"
+        val = _broadcast(one[0], two[0], operator.add)
+        if isinstance(val, list):
+            return val, _render_list(val)
+        return val, f"{one[1]} + {two[1]}"
 
     @visit_children_decor
-    def sub(self, one: tuple[int, str], two: tuple[int, str]) -> tuple[int, str]:
+    def sub(self, one: Value, two: Value) -> Value:
         self.count_complexity(1)
-        return (one[0] - two[0]), f"{one[1]} - {two[1]}"
+        val = _broadcast(one[0], two[0], operator.sub)
+        if isinstance(val, list):
+            return val, _render_list(val)
+        return val, f"{one[1]} - {two[1]}"
 
     @visit_children_decor
-    def mul(self, one: tuple[int, str], two: tuple[int, str]) -> tuple[int, str]:
+    def mul(self, one: Value, two: Value) -> Value:
         self.count_complexity(1)
-        return (one[0] * two[0]), f"{one[1]} \\* {two[1]}"
+        val = _broadcast(one[0], two[0], operator.mul)
+        if isinstance(val, list):
+            return val, _render_list(val)
+        return val, f"{one[1]} \\* {two[1]}"
 
     @visit_children_decor
-    def div(self, one: tuple[int, str], two: tuple[int, str]) -> tuple[int, str]:
+    def div(self, one: Value, two: Value) -> Value:
         self.count_complexity(1)
-        return int(one[0] // two[0]), f"{one[1]} / {two[1]}"
+        val = _broadcast(one[0], two[0], lambda x, y: int(x // y))
+        if isinstance(val, list):
+            return val, _render_list(val)
+        return val, f"{one[1]} / {two[1]}"
 
     @visit_children_decor
-    def mod(self, one: tuple[int, str], two: tuple[int, str]) -> tuple[int, str]:
+    def mod(self, one: Value, two: Value) -> Value:
         self.count_complexity(1)
-        return (one[0] % two[0]), f"{one[1]} % {two[1]}"
+        val = _broadcast(one[0], two[0], operator.mod)
+        if isinstance(val, list):
+            return val, _render_list(val)
+        return val, f"{one[1]} % {two[1]}"
 
     @visit_children_decor
-    def brace(self, expression: tuple[int, str]) -> tuple[int, str]:
+    def brace(self, expression: Value) -> Value:
         self.count_complexity(1)
+        if isinstance(expression[0], list):
+            return expression
         return expression[0], f"({expression[1]})"
 
     def number(self, tree) -> tuple[int, str]:
@@ -270,12 +345,15 @@ class AnnotatedCalculateTree(Interpreter):
         return int(tree.children[0].value), tree.children[0].value
 
     @visit_children_decor
-    def neg(self, one: tuple[int, str]) -> tuple[int, str]:
+    def neg(self, one: Value) -> Value:
         self.count_complexity(1)
+        if isinstance(one[0], list):
+            val = [-x for x in one[0]]
+            return val, _render_list(val)
         return -one[0], f"-{one[1]}"
 
     @visit_children_decor
-    def pick(self, args) -> tuple[int, str]:
+    def pick(self, args) -> Value:
         self.count_complexity(10)
         args = flatten(args)
         self.count_complexity(len(args))
@@ -283,7 +361,7 @@ class AnnotatedCalculateTree(Interpreter):
         return c[0], f"{{{c[1]}}}"
 
     @visit_children_decor
-    def func(self, name: str, args: list[tuple[int, str]] | None = None) -> tuple[int, str]:
+    def func(self, name: str, args: list[Value] | None = None) -> Value:
         if not args:
             raise EvaluationError(f"Function '{name}' requires arguments")
 
@@ -298,7 +376,7 @@ class AnnotatedCalculateTree(Interpreter):
         return funcs[name](values), f"{name}({descr})"
 
     @visit_children_decor
-    def var(self, name: str) -> tuple[int, str]:
+    def var(self, name: str) -> Value:
         self.count_complexity(5)
         if self._depth > 20:
             raise EvaluationError("Depth limit reached (is this a recursive call?)")
@@ -316,18 +394,24 @@ class AnnotatedCalculateTree(Interpreter):
             return val, f"*{name}*{{{desc}}}"
 
     @visit_children_decor
-    def p_value(self, expression: tuple[int, str]) -> tuple[int, str]:
+    def p_value(self, expression: Value) -> Value:
         self.count_complexity(1)
-        if len(expression[1]) > 500:
-            return expression[0], f"[too long to render] › **{expression[0]}**"
-        return expression[0], f"{expression[1]} › **{expression[0]}**"
+        val, desc = expression
+        if isinstance(val, list):
+            return val, f"**{_render_list(val)}**"
+        if len(desc) > 500:
+            return val, f"[too long to render] › **{val}**"
+        return val, f"{desc} › **{val}**"
 
     @visit_children_decor
-    def s_value(self, expression: tuple[int, str]) -> str:
+    def s_value(self, expression: Value) -> str:
         self.count_complexity(1)
-        if len(expression[1]) > 500:
-            return f"[too long to render] › **{expression[0]}**"
-        return f"{expression[1]} › **{expression[0]}**"
+        val, desc = expression
+        if isinstance(val, list):
+            return f"**{_render_list(val)}**"
+        if len(desc) > 500:
+            return f"[too long to render] › **{val}**"
+        return f"{desc} › **{val}**"
 
     @visit_children_decor
     def commentate(self, comment, statement) -> str:
@@ -341,17 +425,21 @@ class AnnotatedCalculateTree(Interpreter):
         return f"{a}; {b}"
 
     @visit_children_decor
-    def value_assignment(self, name: Token, expression: tuple[int, str]) -> str:
+    def value_assignment(self, name: Token, expression: Value) -> str:
         self.count_complexity(5)
         self._env.set(name.value, str(expression[0]))
+        if isinstance(expression[0], list):
+            return f"{name.value} = **{_render_list(expression[0])}**"
         if len(expression[1]) > 500:
             return expression[0], f"{name.value} = [too long to render] › **{expression[0]}**"
         return f"{name.value} = {{{expression[1]}}} › **{expression[0]}**"
 
     @visit_children_decor
-    def p_value_assignment(self, name: Token, program: tuple[int, str]) -> str:
+    def p_value_assignment(self, name: Token, program: Value) -> str:
         self.count_complexity(5)
         self._env.set(name.value, str(program[0]))
+        if isinstance(program[0], list):
+            return f"{name.value} &= **{_render_list(program[0])}**"
         if len(program[1]) > 500:
             return f"{name.value} &= (too long to render) › **{program[1]}**"
         return f"{name.value} &= ({{{program[1]}}}) › **{program[1]}**"
@@ -364,14 +452,17 @@ class AnnotatedCalculateTree(Interpreter):
         return f"{name} = {value}"
 
     @visit_children_decor
-    def p_func(self, statement: str, expression: tuple[int, str]) -> tuple[int, str]:
+    def p_func(self, statement: str, expression: Value) -> Value:
         self.count_complexity(1)
-        if len(expression[1]) > 500:
-            return expression[0], f"{statement}; [too long to render] › **{expression[0]}**"
-        return expression[0], f"{statement}; {expression[1]} › **{expression[0]}**"
+        val, desc = expression
+        if isinstance(val, list):
+            return val, f"{statement}; **{_render_list(val)}**"
+        if len(desc) > 500:
+            return val, f"{statement}; [too long to render] › **{val}**"
+        return val, f"{statement}; {desc} › **{val}**"
 
     @visit_children_decor
-    def t_program(self, program: tuple[int, str]) -> str:
+    def t_program(self, program: Value) -> str:
         self.count_complexity(1)
         return program[1]
 
@@ -398,6 +489,15 @@ class MinMaxTree(Interpreter):
     @visit_children_decor
     def sroll(self, one: str):
         return 1, int(one[1:])
+
+    @visit_children_decor
+    def iroll(self, one: str):
+        a, b = one[:-1].split("d")
+        return int(a), int(a) * int(b)
+
+    @visit_children_decor
+    def siroll(self, one: str):
+        return 1, int(one[1:-1])
 
     @visit_children_decor
     def kroll(self, one: str):
@@ -526,6 +626,13 @@ class FastPreProc(Transformer):
 
     def sroll(self, one: str):
         return Tree("sroll", (int(one[0][1:]),))
+
+    def iroll(self, one):
+        a, b = one[0][:-1].split("d")
+        return Tree("roll", (int(a), int(b)))
+
+    def siroll(self, one):
+        return Tree("sroll", (int(one[0][1:-1]),))
 
     def kroll(self, one: str):
         a, cc = one[0].split("d")
@@ -683,3 +790,4 @@ def distribute(text: str, timeout: timedelta | None = None, env: VarEnv = None, 
         bins[min(int((v - minv) / binw), len(bins) - 1)] += 1
 
     return xbin, bins, t
+    
