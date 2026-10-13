@@ -8,7 +8,7 @@ from rollbot.logsetup import setup_logging
 from rollbot.stat_tracker import stat_tracker
 from rollbot.varenv import var_env_provider
 
-config = dotenv.dotenv_values(os.environ.get("ROLLBOT_CONFIG_FILE", "/etc/data/env"))
+config = dotenv.dotenv_values(os.environ.get("ROLLBOT_CONFIG_FILE", "dev.env"))
 
 setup_logging()
 
