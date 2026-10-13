@@ -1,9 +1,8 @@
 import asyncio
 import secrets
 
-import discord
+import fluxer
 import structlog
-from discord import Interaction
 from lark.exceptions import UnexpectedInput
 
 from rollbot.interpreter.calculator import EvaluationError, evaluate
@@ -14,11 +13,15 @@ from rollbot.varenv import VarEnv, var_env_provider
 logger = structlog.get_logger()
 
 
-def get_var_env(context: Interaction) -> VarEnv:
-    return var_env_provider.get(str(context.user.id), str(context.user.id), str(context.guild_id))
+def get_var_env(context: fluxer.Message) -> VarEnv:
+    return var_env_provider.get(
+        str(context.author.id),
+        str(context.author.id),
+        str(context.guild.id),
+    )
 
 
-async def roll(context: Interaction, roll: str) -> None:
+async def roll(context: fluxer.Message, placeholder: fluxer.Message, roll: str) -> None:
     env = get_var_env(context)
 
     try:
@@ -39,18 +42,21 @@ async def roll(context: Interaction, roll: str) -> None:
         result = "Server error"
 
     try:
-        await context.followup.send(result)
+        await placeholder.edit(content=result)
     except Exception:
-        logger.exception("Error during followup", roll=roll)
-        await context.followup.send("Could not deliver result")
+        logger.exception("Error during edit", roll=roll)
+        await context.channel.send("Could not deliver result")
 
 
-async def distribution(context: Interaction, roll: str) -> None:
+async def distribution(context: fluxer.Message, placeholder: fluxer.Message, roll: str) -> None:
     env = get_var_env(context)
 
     try:
         png = await bake_distribution(roll, env)
-        await context.followup.send(file=discord.File(png, filename=f"{secrets.token_urlsafe(8)}.png"))
+        await placeholder.delete()
+        await context.channel.send(
+            file=fluxer.File(png, filename=f"{secrets.token_urlsafe(8)}.png")
+        )
         return
     except BakingError as e:
         result = e.args[0]
@@ -59,32 +65,34 @@ async def distribution(context: Interaction, roll: str) -> None:
         result = "Server error"
 
     try:
-        await context.followup.send(result)
+        await placeholder.edit(content=result)
     except Exception:
-        logger.exception("Error during followup", roll=roll)
-        await context.followup.send("Could not deliver result")
+        logger.exception("Error during edit", roll=roll)
+        await context.channel.send("Could not deliver result")
 
 
-async def varlist(context: Interaction) -> None:
+async def varlist(context: fluxer.Message, placeholder: fluxer.Message) -> None:
     env = get_var_env(context)
     items = env.items
     if not items:
-        await context.followup.send("No macros defined")
+        await placeholder.edit(content="No macros defined")
     else:
-        await context.followup.send("\n".join(f"{k} = {v}" for k, v in env.items.items()))
+        await placeholder.edit(content="\n".join(f"{k} = {v}" for k, v in env.items.items()))
 
 
-async def unset(context: Interaction, variable: str) -> None:
+async def unset(context: fluxer.Message, placeholder: fluxer.Message, variable: str) -> None:
     env = get_var_env(context)
     if variable in env.items:
         env.unset(variable)
         var_env_provider.update(env)
-        await context.followup.send(f"Deleted {variable}")
+        await placeholder.edit(content=f"Deleted {variable}")
     else:
-        await context.followup.send(f"No such macro {variable}")
+        await placeholder.edit(content=f"No such macro {variable}")
 
 
-async def statistics(context: Interaction, scope: str, die: int, timespan: str) -> None:
+async def statistics(
+    context: fluxer.Message, placeholder: fluxer.Message, scope: str, die: int, timespan: str
+) -> None:
     if timespan == "day":
         days = 1
     elif timespan == "week":
@@ -92,7 +100,7 @@ async def statistics(context: Interaction, scope: str, die: int, timespan: str) 
     elif timespan == "month":
         days = 30
     else:
-        await context.followup.send("Invalid timespan, can be day, week or month")
+        await placeholder.edit(content="Invalid timespan, can be day, week or month")
         return
 
     if scope == "global":
@@ -100,16 +108,16 @@ async def statistics(context: Interaction, scope: str, die: int, timespan: str) 
         stats = stat_tracker.get_global_stats(die, days)
     elif scope == "guild":
         scope_name = context.guild.name
-        stats = stat_tracker.get_guild_stats(str(context.guild_id), die, days)
+        stats = stat_tracker.get_guild_stats(str(context.guild.id), die, days)
     elif scope == "user":
-        scope_name = context.user.name
-        stats = stat_tracker.get_user_stats(str(context.user.id), die, days)
+        scope_name = context.author.name
+        stats = stat_tracker.get_user_stats(str(context.author.id), die, days)
     else:
-        await context.followup.send("Invalid scope, can be global, guild or user")
+        await placeholder.edit(content="Invalid scope, can be global, guild or user")
         return
 
     if not stats:
-        await context.followup.send("No data available")
+        await placeholder.edit(content="No data available")
         return
 
     rolls = sum(stats.values())
@@ -117,4 +125,7 @@ async def statistics(context: Interaction, scope: str, die: int, timespan: str) 
     png = await bake_statistics(
         f"{scope_name} statistics of a d{die} this {timespan}, rolled {rolls} times.", stats, die
     )
-    await context.followup.send(file=discord.File(png, filename=f"{secrets.token_urlsafe(8)}.png"))
+    await placeholder.delete()
+    await context.channel.send(
+        file=fluxer.File(png, filename=f"{secrets.token_urlsafe(8)}.png")
+    )

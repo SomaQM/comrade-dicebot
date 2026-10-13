@@ -1,65 +1,65 @@
 import itertools
 
-import discord
+import fluxer
 import structlog
 
 from . import text
-from .main import bot, tree
+from .main import bot
 
 logger = structlog.get_logger()
+known_guilds: set[int] = set()
 
 
 @bot.event
 async def on_ready():
-    await tree.sync()
-
+    global known_guilds
+    known_guilds = {g.id for g in bot.guilds}
     logger.info("Logged in", bot_name=bot.user.name, bot_id=bot.user.id)
-
     for batch in itertools.batched(bot.guilds, 50):
         logger.info("Connected to guilds", guilds=[g.name for g in batch])
 
 
 async def hello_server(channel):
-    if channel and channel.permissions_for(channel.guild.me).send_messages:
-        try:
-            await channel.send(
-                embed=discord.Embed(
-                    title="Thank you for using roll-bot!",
-                    type="rich",
-                    description=text.welcome_text.strip(),
-                )
+    if not channel:
+        return False
+    try:
+        await channel.send(
+            embed=fluxer.Embed(
+                title="Thank you for using roll-bot!",
+                description=text.welcome_text.strip(),
             )
-            logger.info("Said hello", guild=channel.guild.name, channel=channel.name)
-            return True
-        except Exception:
-            return False
-    return False
+        )
+        logger.info("Said hello", guild_id=channel.guild_id, channel=channel.name)
+        return True
+    except Exception:
+        return False
 
 
 @bot.event
-async def on_guild_join(guild: discord.Guild):
-    # The bot has joined a new server, lets let them know what this bot can do
+async def on_guild_join(guild: fluxer.Guild):
+    if guild.id in known_guilds:
+        return
+    known_guilds.add(guild.id)
     logger.info("Joined new server", guild=guild.name)
 
-    try:
-        if await hello_server(guild.system_channel):
-            return
-    except Exception:
-        pass
+    if guild._http is None:
+        logger.error("No HTTP client on guild", guild=guild.name)
+        return
 
     try:
-        if await hello_server(guild.rules_channel):
-            return
+        channels_data = await guild._http.get_guild_channels(guild.id)
     except Exception:
-        pass
+        logger.exception("Could not fetch channels", guild=guild.name)
+        return
 
-    try:
-        if await hello_server(guild.public_updates_channel):
-            return
-    except Exception:
-        pass
+    channels = [fluxer.Channel.from_data(d, guild._http) for d in channels_data]
 
-    for channel in guild.text_channels:
+    # fluxer.py's Guild does not expose system_channel / rules_channel /
+    # public_updates_channel, so there's no preferred channel to try first.
+    # Fall straight through to the first text channel.
+    for channel in channels:
+        if not channel.is_text_channel:
+            continue
         if await hello_server(channel):
             return
 

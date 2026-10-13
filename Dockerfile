@@ -17,15 +17,19 @@ RUN --mount=type=cache,target=$POETRY_CACHE_DIR poetry install --without dev --n
 FROM python:3.14-slim as runtime
 
 ENV VIRTUAL_ENV=/app/.venv \
-    PATH="/app/.venv/bin:$PATH"
+    PATH="/app/.venv/bin:$PATH" \
+    SQLITE_PATH=/data/rollbot.db
 
-RUN useradd rollbot && mkdir /app
+RUN useradd rollbot && mkdir -p /app /data
 
 COPY --from=builder ${VIRTUAL_ENV} ${VIRTUAL_ENV}
 COPY src/rollbot /app/rollbot
-RUN chown -R rollbot:rollbot /app
+
+RUN chown -R rollbot:rollbot /app /data
 
 USER rollbot
 WORKDIR /app
+
+VOLUME ["/data"]
 
 ENTRYPOINT ["python", "-m", "rollbot"]

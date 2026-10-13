@@ -1,5 +1,6 @@
-import discord
+import fluxer
 
-intents = discord.Intents.default()
-bot = discord.AutoShardedClient(intents=intents)
-tree = discord.app_commands.CommandTree(bot)
+intents = fluxer.Intents.default()
+intents.MESSAGE_CONTENT = True
+
+bot = fluxer.Bot(command_prefix="!", intents=intents)

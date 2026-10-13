@@ -1,6 +1,5 @@
 helptext = """
-    Rollbot implements the /roll, /distribution and /list command.
-    Please go to [tmiedema.com/rollbot](https://tmiedema.com/rollbot) to learn more
+    Rollbot implements the !roll, !distribution and !list command.
     Rollbot has the following functionality:
         roll examples: d20, 8d8
         keep highest: 3d20k2, 4d6k3
@@ -31,8 +30,6 @@ helptext = """
 
 
 welcome_text = """
-    Rollbot supports Discord slash commands. Use /roll and /distribution to roll dice.
-    If you need any help, check out [the website](https://tmiedema.com/rollbot)! You can find a
-    bunch of links there, also including a link to the source code if you are interested.
-    Suggestions for improvements are also very welcome!
+    Rollbot supports text commands. Use !roll and !distribution to roll dice.
+    If you need any help, ask SomaQM.
 """
