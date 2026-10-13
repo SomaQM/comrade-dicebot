@@ -2,11 +2,11 @@ import os
 
 import dotenv
 
-from comrade-dicebot.bot import bot
-from comrade-dicebot.db import SQLiteDB
-from comrade-dicebot.logsetup import setup_logging
-from comrade-dicebot.stat_tracker import stat_tracker
-from comrade-dicebot.varenv import var_env_provider
+from dicebot.bot import bot
+from dicebot.db import SQLiteDB
+from dicebot.logsetup import setup_logging
+from dicebot.stat_tracker import stat_tracker
+from dicebot.varenv import var_env_provider
 
 config = dotenv.dotenv_values(os.environ.get("COMRADE_DICEBOT_CONFIG_FILE", "/etc/data/env"))
 

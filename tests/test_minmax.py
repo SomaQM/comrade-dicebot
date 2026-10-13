@@ -1,6 +1,6 @@
 import pytest
 
-from comrade-dicebot.interpreter.calculator import minmax
+from dicebot.interpreter.calculator import minmax
 
 
 @pytest.mark.parametrize(

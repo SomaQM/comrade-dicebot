@@ -12,8 +12,8 @@ import structlog
 from lark import Token, Tree
 from lark.visitors import Interpreter, Transformer
 
-from comrade-dicebot.stat_tracker import stat_tracker
-from comrade-dicebot.varenv import VarEnv
+from dicebot.stat_tracker import stat_tracker
+from dicebot.varenv import VarEnv
 
 from .functions import funcs
 from .parser import parser, reconstructor

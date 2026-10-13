@@ -2,8 +2,8 @@ import asyncio
 
 import pytest
 
-from comrade-dicebot.plottenbakker.asyncing import BakingError, bake_distribution, bake_statistics
-from comrade-dicebot.varenv import VarEnv
+from dicebot.plottenbakker.asyncing import BakingError, bake_distribution, bake_statistics
+from dicebot.varenv import VarEnv
 
 
 def test_bake_distribution():

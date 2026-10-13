@@ -5,10 +5,10 @@ import fluxer
 import structlog
 from lark.exceptions import UnexpectedInput
 
-from comrade-dicebot.interpreter.calculator import EvaluationError, evaluate
-from comrade-dicebot.plottenbakker.asyncing import BakingError, bake_distribution, bake_statistics
-from comrade-dicebot.stat_tracker import stat_tracker
-from comrade-dicebot.varenv import VarEnv, var_env_provider
+from dicebot.interpreter.calculator import EvaluationError, evaluate
+from dicebot.plottenbakker.asyncing import BakingError, bake_distribution, bake_statistics
+from dicebot.stat_tracker import stat_tracker
+from dicebot.varenv import VarEnv, var_env_provider
 
 logger = structlog.get_logger()
 

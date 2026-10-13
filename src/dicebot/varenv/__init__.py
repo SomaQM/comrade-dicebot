@@ -1,4 +1,4 @@
-from comrade-dicebot.db import SQLiteDB
+from dicebot.db import SQLiteDB
 
 
 class VarEnv:

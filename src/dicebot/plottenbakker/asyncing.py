@@ -2,7 +2,7 @@ import asyncio
 import sys
 from io import BytesIO
 
-from comrade-dicebot.varenv import VarEnv
+from dicebot.varenv import VarEnv
 
 from . import BakingError
 from .plotter import plot_distribution, plot_statistics

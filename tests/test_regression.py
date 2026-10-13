@@ -1,7 +1,7 @@
 import pytest
 
-from comrade-dicebot.interpreter.calculator import AnnotatedCalculateTree, EvaluationError, evaluate
-from comrade-dicebot.varenv import VarEnv
+from dicebot.interpreter.calculator import AnnotatedCalculateTree, EvaluationError, evaluate
+from dicebot.varenv import VarEnv
 
 
 def test_func_arity():

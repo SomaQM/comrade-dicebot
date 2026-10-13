@@ -2,11 +2,11 @@ import io
 
 import pytest
 
-from comrade-dicebot.db import SQLiteDB
-from comrade-dicebot.interpreter.calculator import evaluate
-from comrade-dicebot.plottenbakker.plotter import plot_statistics
-from comrade-dicebot.stat_tracker import stat_tracker
-from comrade-dicebot.varenv import VarEnv, var_env_provider
+from dicebot.db import SQLiteDB
+from dicebot.interpreter.calculator import evaluate
+from dicebot.plottenbakker.plotter import plot_statistics
+from dicebot.stat_tracker import stat_tracker
+from dicebot.varenv import VarEnv, var_env_provider
 
 
 @pytest.fixture(scope="function")

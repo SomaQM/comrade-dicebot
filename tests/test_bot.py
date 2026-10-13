@@ -1,7 +1,7 @@
 import asyncio
 from unittest.mock import AsyncMock, MagicMock, patch
 
-from comrade-dicebot.bot.handlers import roll as roll_handler
+from dicebot.bot.handlers import roll as roll_handler
 
 
 def test_bot_importable():
