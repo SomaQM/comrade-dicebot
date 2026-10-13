@@ -23,7 +23,7 @@ ENV VIRTUAL_ENV=/app/.venv \
 RUN useradd comrade-dicebot && mkdir -p /app /data
 
 COPY --from=builder ${VIRTUAL_ENV} ${VIRTUAL_ENV}
-COPY src/comrade-dicebot /app/comrade-dicebot
+COPY src/dicebot /app/comrade-dicebot
 
 RUN chown -R comrade-dicebot:comrade-dicebot /app /data
 
